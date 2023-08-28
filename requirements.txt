@@ -1,0 +1,24 @@
+tk
+numpy
+matplotlib
+pillow
+tqdm
+scikit-learn
+scikit-image
+hyperopt
+ray[tune]
+joblib
+pandas
+
+
+
+--extra-index-url https://download.pytorch.org/whl/cu118
+torch
+--extra-index-url https://download.pytorch.org/whl/cu118
+torchvision
+--extra-index-url https://download.pytorch.org/whl/cu118
+torchaudio
+
+tensorboard
+lightgbm
+xgboost
