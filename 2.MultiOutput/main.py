@@ -64,8 +64,8 @@ parser.add_argument("--mode", '-m', default='ml', type=str, help='weather to use
 parser.add_argument("--datashape", '-ds', default='dropempty', type=str, help='weather to use original data or data dropping useless black columns. Choose between original and dropempty.')
 parser.add_argument("--train_size", '-ts', default=0.8, type=float, help='Proportion of train data. 0.8 -> 80%')
 parser.add_argument("--validation_size", '-vs', default=0.1, type=float, help='Proportion of train data. 0.1 -> 10%')
-parser.add_argument("--log_path", '-lp', default=r"C:\Users\hojun\OneDrive\Desktop\Hojun\Hyundai\Second_part\logs\lgb_gpu_xscale_new_test", type=str, help='Serving as logging file path and model saving path')
-parser.add_argument("--x_scale", '-xs', default='minmax', type=str, help='normalizing input data. Choose between one, minmax, and standard')
+parser.add_argument("--log_path", '-lp', default=r"C:\Users\hojun\OneDrive\Desktop\Hojun\Hyundai\Second_part\logs\lgb_tutorial", type=str, help='Serving as logging file path and model saving path')
+parser.add_argument("--x_scale", '-xs', default='one', type=str, help='normalizing input data. Choose between one, minmax, and standard')
 parser.add_argument("--y_scale", '-ys', default='minmax', type=str, help='normalizing label data. Choose between minmax, and standard')
 parser.add_argument("--model", '-dm', default='lgb', type=str, help='which model to use for the task')
 
@@ -129,15 +129,12 @@ def main(args):
 
     
         dataset_size = len(TorchHyundaiDataset)
-        train_size = int(dataset_size * 0.8)
-        validation_size = int(dataset_size * 0.1)
+        train_size = int(dataset_size * args.train_size)
+        validation_size = int(dataset_size * args.validation_size)
         test_size = dataset_size - train_size - validation_size
         train_dataset, validation_dataset, test_dataset = random_split(TorchHyundaiDataset, [train_size, validation_size, test_size])
 
 
-
-
-        # dir(train_dataset.dataset.data)
         logger.info(f'Train size: {train_size}')
         logger.info(f'Validation size: {validation_size}')
         logger.info(f'Test size: {test_size}')
@@ -170,7 +167,6 @@ def main(args):
             
 
             pickle.dump(y_scaler, open(f'{args.log_path}/y_scaler.pkl', 'wb'))
-            # zz = pickle.load(open(f'{args.log_path}/{args.filename}/y_scaler.pkl', 'rb'))
         
         elif args.y_scale == 'standard':
             y_scaler = StandardScaler()
@@ -237,10 +233,9 @@ def main(args):
         
         if args.model == 'mor':
             model = MultOutRegressor(args.image_dim , args.label_dim).to(device)
-            # model = MultOutRegressor(420 , args.label_dim).to(device)
+
         
         elif args.model == 'morsa':
-            # model = MultOutRegressorSelfAttentionMLP(img_dim=args.image_dim, hidden_dim=4480, seq_len=140, embed_dim=32).to(device)
             model = MultOutRegressorSelfAttentionMLP(img_dim=args.image_dim, seq_len=args.seq_len, embed_dim=args.embed_dim).to(device)
         
         elif args.model == 'mocr':
@@ -274,10 +269,11 @@ def main(args):
             total_train_rmse=0.0
             total_val_rmse=0.0
             model.train()
-            # model.to(device)
+
             for data, labels in train_dataloader:
                 batch_size = data.shape[0]
                 data, labels = data.float().reshape(batch_size, -1).to(device), labels.float().to(device)
+                
     
                 # Forward Pass
                 preds = model(data)
@@ -474,8 +470,8 @@ def main(args):
                 raise ValueError('choose datashape between original and dropempty')
                 
             dataset_size = len(TorchHyundaiDataset)
-            train_size = int(dataset_size * 0.8)
-            validation_size = int(dataset_size * 0.1)
+            train_size = int(dataset_size * args.train_size)
+            validation_size = int(dataset_size * args.validation_size)
             test_size = dataset_size - train_size - validation_size
             train_dataset, validation_dataset, test_dataset = random_split(TorchHyundaiDataset, [train_size, validation_size, test_size])
     
@@ -508,10 +504,11 @@ def main(args):
                     x_data.append(image[:, np.r_[0:6, 10:16, 20:22]])
                 else:
                     raise ValueError('error!')
-    
+            
+            
             x_data = np.stack(x_data)
             x_data = x_data.reshape(len(x_data), -1)
-                
+
             y_data = np.stack(y_data)
             y_data = np.squeeze(y_data, axis=2)
             
@@ -622,6 +619,7 @@ def main(args):
         logger.info(f'Predicting values with validation dataset...')
         ##predict outputs
         y_pred = model.predict(x_valid)
+        
                 
         
         logger.info(f'Saving the predictions...')

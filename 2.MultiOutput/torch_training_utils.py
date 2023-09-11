@@ -52,13 +52,7 @@ def train(n_epochs , train_dataloader , valid_dataloader, model, criterion , opt
     for epoch in tqdm(range(n_epochs)) :
         train_loss = one_epoch(train_dataloader , model.to(device), criterion.to(device) , optimizer)
         if epoch > 0 :
-            
-            # train_loss += loss.item()
-            # running_loss += loss.item()
-            # train_loss = train_loss / len(train_dataloader)
-            
-            # train_loss.append(loss)
-            # train_rmse.append(np.sqrt(loss))
+
             if epoch % log_interval == 0 :
                 print(f'Train loss at epoch {epoch} : {train_loss}')
                 print(f'Train RMSE at epoch {epoch} : {np.sqrt(train_loss)}')
@@ -69,7 +63,7 @@ def train(n_epochs , train_dataloader , valid_dataloader, model, criterion , opt
     with torch.no_grad():
         model.eval()
         val_loss = one_epoch(valid_dataloader , model.to(device), criterion.to(device) , optimizer)
-        # valid_rmse.append(np.sqrt(val_loss))
+
             
         if epoch % log_interval == 0 :
             # visualize(train_loss)

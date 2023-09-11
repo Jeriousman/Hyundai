@@ -88,8 +88,7 @@ def main(args):
     # set a logger file
     isExist = os.path.exists(f'{args.log_path}')
     if not isExist:
-        # os.umask(0)
-        # os.makedirs(f'{args.tensorboard_log_dir}/{args.model_name}/', mode=0o777)
+
         # Create a new directory because it does not exist
         os.makedirs(f'{args.log_path}')
         print("The new directory is created!")
@@ -109,8 +108,7 @@ def main(args):
     torch.manual_seed(seed)
     logger.info(f"Random Seed: , {seed}")
     
-    # python train_fcgan_PCGANISCloss_WGAN-GP.py --data_path '/home/hannah/Hyundai/data' --norm_mean 0.5 --norm_stdv 0.5 --device 'cuda' --learning_rate_gen 0.0005 --learning_rate_disc 0.0005 --zdim 100 --image_dim 900 --batch_size 512 --epochs 100 --constraint_lambda 10 --lambda_gp 10 --critic_iter 5 --opt_beta1 0.0 --opt_beta2 0.9 --disc_mode 'wgan' --tensorboard_log_dir '/home/hannah/Hyundai/CGAN/logs' --model_dir '/home/hannah/Hyundai/CGAN/models' --model_name 'wgan_test'
-    
+
     
     transformation = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))]  ##incase I wanna scale image between [0,1] transforms.ToTensor() is suffice. if -1, 1, normalize.
@@ -141,19 +139,12 @@ def main(args):
     
     # Hyperparameters etc.
     
-    # device = "cuda" if torch.cuda.is_available() else "cpu"
-    # lr = 5e-5
-    # z_dim = 100
-    # image_dim = 10 * 30 * 3  # 784
-    # batch_size = 512
-    # num_epochs = 100
+
     num_durability_classes = len(dataset.durability_emb_dict)
     num_weight_classes = len(dataset.weight_emb_dict)
     
     step = 0
-    # modelname = f'fcgan_constraint_lambda-{args.constraint_lambda}_lambda_gp_-{args.lambda_gp}_critic_iter-{args.critic_iter}_norm_mean-{args.norm_mean}_norm_stdv-{args.norm_stdv}_learning_rate_gen-{args.learning_rate_gen}_learning_rate_disc-{args.learning_rate_disc}_zdim-{args.zdim}_image_dim-{args.image_dim}_batch_size-{args.batch_size}_epochs-{args.epochs}_critic_iter-{args.critic_iter}_opt_gen_betas-{args.opt_gen_betas}_opt_disc_betas-{args.opt_disc_betas}_disc_mode-{args.disc_mode}'
-    # criterion = nn.BCELoss()
-    
+
     
     
     writer_fake = SummaryWriter(f"{args.log_path}/tensorboard_records/fake")
@@ -188,7 +179,7 @@ def main(args):
         qhead.apply(initialize_weights)##똑같다                  
         
 
-    # elif args.gan_model == 'wgan' or args.gan_model == 'wgangp':
+
     elif args.gan_model == 'vanila':
         
         if args.disc_mode == 'vanila':
@@ -200,19 +191,14 @@ def main(args):
             zc_dim = args.zdim
             gen = Generator_discrete_wgan(zdim=zc_dim, input_dim=args.input_dim, output_dim=args.input_dim, num_durability_classes=num_durability_classes, num_weight_classes=num_weight_classes).to(args.device)
         elif args.gen_mode == 'selfattention':
-            # zc_dim = args.zdim + num_durability_classes + num_weight_classes
+
             zc_dim = args.zdim + 1 + 1
             gen = SelfAttentionMLPGenerator(zc_dim=zc_dim, input_dim=args.input_dim, height=args.height, width=args.width, output_dim=args.input_dim, embed_dim=args.embed_dim, num_heads=args.num_heads).to(args.device) ##need to update
 
         gen.apply(initialize_weights)
         disc.apply(initialize_weights)
             
-        
-    # elif args.gan_model == 'mlp':
-    #     # elif args.disc_mode == 'mlp_sum':
-    #     gen.apply(initialize_weights)
-    #     disc.apply(initialize_weights)
-    #     pass
+
     
     else:
         raise ValueError('You must choose gan_model among infogan, wga, wgangp, mlp')
@@ -256,32 +242,11 @@ def main(args):
             opt_gen = optim.RMSprop(gen.parameters(), lr=args.learning_rate_gen)
             opt_disc = optim.RMSprop(disc.parameters(), lr=args.learning_rate_disc)
         
-        
-
-
-
-    # discrete_c1_dim = num_durability_classes
-    # discrete_c2_dim = num_weight_classes
-    # idx = np.arange(discrete_c1_dim).repeat(10)
-    
-    # dis_c1 = torch.zeros(100, params['num_dis_c'], params['dis_c_dim'], device=device)
-    # for i in range(params['num_dis_c']):
-    #     dis_c[torch.arange(0, 100), i, idx] = 1.0
-
-    # dis_c = dis_c.view(100, -1, 1, 1)
-
-    # fixed_noise = torch.cat((fixed_noise, dis_c), dim=1)
     
 
-    
-
-    
-
-    # fixed_noise = torch.randn((args.batch_size, args.zdim)).to(args.device)
     loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, drop_last=True)
     
     torch.cuda.is_available()
-    # jw = jewon.detach().cpu().numpy()
     print('training start!')
     logger.info('training start!') ##logging all argparse information
     logger.info('='*64)
@@ -293,17 +258,13 @@ def main(args):
         logger.info('InfoGAN model with vanila loss term training initiated!')
         for epoch in tqdm(range(args.epochs)):
             for batch_idx, (real, durability, weight, jewon, mask, imagename) in tqdm(enumerate(loader)):
-            #     break
-            # break
-                ##taking out inputs
                 real = real.view(-1, args.input_dim).to(args.device)
                 durability = durability.long().to(args.device)
                 weight = weight.long().to(args.device)
                 jewon = jewon.view(-1, args.input_dim).to(args.device)
                 mask = mask.view(-1, args.input_dim).to(args.device)
                 batch_size = real.shape[0]
-                # real.shape
-                # durability.shape
+
                 
                 gen.train()
                 disc.train()
@@ -373,7 +334,6 @@ def main(args):
                 durability_logits, weight_logits = qhead(fake_to_be_real_intermediate)
                 
                 
-                # target = torch.LongTensor(idx).to(device)
                 # Calculating loss for discrete latent code.
                 discrete_loss = 0
                 discrete_loss += criterionQ_dis(durability_logits, durability)
@@ -391,11 +351,7 @@ def main(args):
                     logger.info(f"Epoch [{epoch}/{args.epochs}] Batch {batch_idx}/{len(loader)} \
                                           Loss D: {D_loss:.4f}, loss G: {G_loss:.4f}"
                                 )
-                    # print(
-                    #     f"Epoch [{epoch}/{args.epochs}] Batch {batch_idx}/{len(loader)} \
-                    #           Loss D: {D_loss:.4f}, loss G: {G_loss:.4f}"
-                    # )
-            
+
     
                     with torch.no_grad():
                         
@@ -547,8 +503,6 @@ def main(args):
                         'qhead_state_dict' : qhead.state_dict(),
                         'opt_disc': opt_disc.state_dict(),
                         'opt_gen': opt_gen.state_dict(),
-                        # 'norm_mean': args.norm_mean,
-                        # 'norm_stdv': args.norm_stdv,
                         'learning_rate_gen': args.learning_rate_gen,
                         'learning_rate_disc': args.learning_rate_disc,
                         'batch_size': args.batch_size,
@@ -574,8 +528,6 @@ def main(args):
                         'loss_mode': args.loss_mode,
                         'datashape': args.datashape,
                         'optimizer': args.optimizer,
-                        # 'model_path': args.model_path,
-                        # 'model_name': args.model_name,
                         'log_path': args.log_path}
                         , model_saving_full_path)
             
@@ -587,8 +539,6 @@ def main(args):
                         'gen_state_dict': gen.state_dict(),
                         'opt_disc': opt_disc.state_dict(),
                         'opt_gen': opt_gen.state_dict(),
-                        # 'norm_mean': args.norm_mean,
-                        # 'norm_stdv': args.norm_stdv,
                         'learning_rate_gen': args.learning_rate_gen,
                         'learning_rate_disc': args.learning_rate_disc,
                         'batch_size': args.batch_size,
@@ -614,8 +564,6 @@ def main(args):
                         'loss_mode': args.loss_mode,
                         'datashape': args.datashape,
                         'optimizer': args.optimizer,
-                        # 'model_path': args.model_path,
-                        # 'model_name': args.model_name,
                         'log_path': args.log_path}
                         , model_saving_full_path)
         
@@ -632,8 +580,7 @@ def main(args):
         logger.info('InfoGAN model with wgan loss term training initiated!')
         for epoch in tqdm(range(args.epochs)):
             for batch_idx, (real, durability, weight, jewon, mask, imagename) in tqdm(enumerate(loader)):
-            #     break
-            # break
+
                 ##taking out inputs
                 real = real.view(-1, args.input_dim).to(args.device)
                 durability = durability.long().to(args.device)
@@ -641,8 +588,7 @@ def main(args):
                 jewon = jewon.view(-1, args.input_dim).to(args.device)
                 mask = mask.view(-1, args.input_dim).to(args.device)
                 batch_size = real.shape[0]
-                # real.shape
-                # durability.shape
+
                 
                 gen.train()
                 disc.train()
@@ -650,15 +596,8 @@ def main(args):
     
 
                 for _ in range(args.critic_iter):
-                    # break
                     ### Train Discriminator: max log(D(x)) + log(1 - D(G(z)))
                     
-                    ##for normal model
-                    # noise = torch.randn(batch_size, args.zdim).to(args.device)
-                    # final_noise = torch.cat((noise, durability.unsqueeze(1), weight.unsqueeze(1)), dim =1)
-                    # fake = gen(noise, durability, weight, noise)
-                    
-                        
                     ##generating noise and codes
                     noise = torch.randn(batch_size, args.zdim).to(args.device)
                     
@@ -681,24 +620,16 @@ def main(args):
                     
                     
                     loss_disc = -(torch.mean(disc_real) - torch.mean(disc_fake))
-                    # lossD_real = criterion(disc_real, torch.ones_like(disc_real))        
-                    # lossD_fake = criterion(disc_fake, torch.zeros_like(disc_fake))
-                    # lossD = (lossD_real + lossD_fake) / 2
-                    
-                    # gp = gradient_penalty(disc, durability_weight, jewon, real_image, fake_image, device=device)
+
+
                     disc.zero_grad()
                     loss_disc.backward(retain_graph=True)
                     opt_disc.step()
-                        # clip critic weights between -0.01, 0.01
                     for p in disc.parameters():
                         p.data.clamp_(-args.weight_clip, args.weight_clip)
 
                 
                 ### Train Generator: min log(1 - D(G(z))) <-> max log(D(G(z))
-                # where the second option of maximizing doesn't suffer from
-                # saturating gradients     
-                # gen_fake = gen(final_noise, jewon)
-                
                 # Fake data treated as real.
                 
                 noise = torch.randn(batch_size, args.zdim).to(args.device)
@@ -721,13 +652,9 @@ def main(args):
                 
                 fake_to_be_real_intermediate = disc(gen_fake)  
                 fake_to_be_real_output = dhead(fake_to_be_real_intermediate).view(-1)
-                
-                # fake_to_be_real_output.shape
-                # lossG = criterionD(fake_to_be_real_output, torch.ones_like(fake_to_be_real_output))
     
                 durability_logits, weight_logits = qhead(fake_to_be_real_intermediate)
-                
-                # target = torch.LongTensor(idx).to(device)
+
                 # Calculating loss for discrete latent code.
                 discrete_loss = 0
                 discrete_loss += criterionQ_dis(durability_logits, durability)
@@ -743,13 +670,6 @@ def main(args):
                 opt_gen.step()
                 gen.zero_grad()
                 
-                
-                # # loss_gen = -(torch.mean(disc(gen_fake)) + LAMDA*torch.norm(real - torch.mul(noised_jewon, fake)))       
-                # loss_gen = -(torch.mean(disc(gen_fake)))  -args.constraint_lambda*torch.norm(jewon - torch.mul(mask, gen_fake))    
-                # # lossG = criterion(output, torch.ones_like(output)) + 1*torch.norm(real - torch.mul(noised_jewon, fake))
-                # gen.zero_grad()
-                # loss_gen.backward()
-                # opt_gen.step()
 
                 if (batch_idx % 100 == 0 and batch_idx > 0) or (batch_idx == len(loader) -1 and batch_idx > 0):
                     print(
@@ -907,8 +827,6 @@ def main(args):
                         'qhead_state_dict' : qhead.state_dict(),
                         'opt_disc': opt_disc.state_dict(),
                         'opt_gen': opt_gen.state_dict(),
-                        # 'norm_mean': args.norm_mean,
-                        # 'norm_stdv': args.norm_stdv,
                         'learning_rate_gen': args.learning_rate_gen,
                         'learning_rate_disc': args.learning_rate_disc,
                         'batch_size': args.batch_size,
@@ -934,8 +852,6 @@ def main(args):
                         'loss_mode': args.loss_mode,
                         'datashape': args.datashape,
                         'optimizer': args.optimizer,
-                        # 'model_path': args.model_path,
-                        # 'model_name': args.model_name,
                         'log_path': args.log_path}
                         , model_saving_full_path)
             
@@ -947,8 +863,6 @@ def main(args):
                         'gen_state_dict': gen.state_dict(),
                         'opt_disc': opt_disc.state_dict(),
                         'opt_gen': opt_gen.state_dict(),
-                        # 'norm_mean': args.norm_mean,
-                        # 'norm_stdv': args.norm_stdv,
                         'learning_rate_gen': args.learning_rate_gen,
                         'learning_rate_disc': args.learning_rate_disc,
                         'batch_size': args.batch_size,
@@ -974,8 +888,6 @@ def main(args):
                         'loss_mode': args.loss_mode,
                         'datashape': args.datashape,
                         'optimizer': args.optimizer,
-                        # 'model_path': args.model_path,
-                        # 'model_name': args.model_name,
                         'log_path': args.log_path}
                         , model_saving_full_path)
         
@@ -991,8 +903,7 @@ def main(args):
         logger.info('InfoGAN model with wgangp loss term training initiated!')
         for epoch in tqdm(range(args.epochs)):
             for batch_idx, (real, durability, weight, jewon, mask, imagename) in tqdm(enumerate(loader)):
-            #     break
-            # break
+
                 ##taking out inputs
                 real = real.view(-1, args.input_dim).to(args.device)
                 durability = durability.long().to(args.device)
@@ -1000,20 +911,14 @@ def main(args):
                 jewon = jewon.view(-1, args.input_dim).to(args.device)
                 mask = mask.view(-1, args.input_dim).to(args.device)
                 batch_size = real.shape[0]
-                # real.shape
-                # durability.shape
+
         
                 gen.train()
                 disc.train()
 
                 for _ in range(args.critic_iter):
-                    # break
                     ### Train Discriminator: max log(D(x)) + log(1 - D(G(z)))
-                    
-                    ##for normal model
-                    # noise = torch.randn(batch_size, args.zdim).to(args.device)
-                    # final_noise = torch.cat((noise, durability.unsqueeze(1), weight.unsqueeze(1)), dim =1)
-                    # fake = gen(noise, durability, weight, noise)
+
                     
                         
                     ##generating noise and codes
@@ -1038,24 +943,15 @@ def main(args):
                     gp = gradient_penalty_onlyimage1d(disc, real, fake, device=args.device)
                     
                     loss_disc = -(torch.mean(disc_real) - torch.mean(disc_fake)) + args.lambda_gp * gp
-                    # lossD_real = criterion(disc_real, torch.ones_like(disc_real))        
-                    # lossD_fake = criterion(disc_fake, torch.zeros_like(disc_fake))
-                    # lossD = (lossD_real + lossD_fake) / 2
-                    
-                    # gp = gradient_penalty(disc, durability_weight, jewon, real_image, fake_image, device=device)
+
                     disc.zero_grad()
                     loss_disc.backward(retain_graph=True)
                     opt_disc.step()
-                        # clip critic weights between -0.01, 0.01
-                    # for p in disc.parameters():
-                    #     p.data.clamp_(-args.weight_clip, args.weight_clip)
 
                 
                 ### Train Generator: min log(1 - D(G(z))) <-> max log(D(G(z))
                 # where the second option of maximizing doesn't suffer from
-                # saturating gradients     
-                # gen_fake = gen(final_noise, jewon)
-                
+                # saturating gradients
                 # Fake data treated as real.
                 
                 noise = torch.randn(batch_size, args.zdim).to(args.device)
@@ -1078,13 +974,10 @@ def main(args):
                 
                 fake_to_be_real_intermediate = disc(gen_fake)  
                 fake_to_be_real_output = dhead(fake_to_be_real_intermediate).view(-1)
-                
-                # fake_to_be_real_output.shape
-                # lossG = criterionD(fake_to_be_real_output, torch.ones_like(fake_to_be_real_output))
+            
     
                 durability_logits, weight_logits = qhead(fake_to_be_real_intermediate)
-                
-                # target = torch.LongTensor(idx).to(device)
+
                 # Calculating loss for discrete latent code.
                 discrete_loss = 0
                 discrete_loss += criterionQ_dis(durability_logits, durability)
@@ -1100,13 +993,6 @@ def main(args):
                 opt_gen.step()
                 gen.zero_grad()
                 
-                
-                # # loss_gen = -(torch.mean(disc(gen_fake)) + LAMDA*torch.norm(real - torch.mul(noised_jewon, fake)))       
-                # loss_gen = -(torch.mean(disc(gen_fake)))  -args.constraint_lambda*torch.norm(jewon - torch.mul(mask, gen_fake))    
-                # # lossG = criterion(output, torch.ones_like(output)) + 1*torch.norm(real - torch.mul(noised_jewon, fake))
-                # gen.zero_grad()
-                # loss_gen.backward()
-                # opt_gen.step()
 
                 if (batch_idx % 100 == 0 and batch_idx > 0) or (batch_idx == len(loader) -1 and batch_idx > 0):
                     print(
@@ -1264,8 +1150,6 @@ def main(args):
                         'qhead_state_dict' : qhead.state_dict(),
                         'opt_disc': opt_disc.state_dict(),
                         'opt_gen': opt_gen.state_dict(),
-                        # 'norm_mean': args.norm_mean,
-                        # 'norm_stdv': args.norm_stdv,
                         'learning_rate_gen': args.learning_rate_gen,
                         'learning_rate_disc': args.learning_rate_disc,
                         'batch_size': args.batch_size,
@@ -1291,8 +1175,6 @@ def main(args):
                         'loss_mode': args.loss_mode,
                         'datashape': args.datashape,
                         'optimizer': args.optimizer,
-                        # 'model_path': args.model_path,
-                        # 'model_name': args.model_name,
                         'log_path': args.log_path}
                         , model_saving_full_path)
             
@@ -1304,8 +1186,6 @@ def main(args):
                         'gen_state_dict': gen.state_dict(),
                         'opt_disc': opt_disc.state_dict(),
                         'opt_gen': opt_gen.state_dict(),
-                        # 'norm_mean': args.norm_mean,
-                        # 'norm_stdv': args.norm_stdv,
                         'learning_rate_gen': args.learning_rate_gen,
                         'learning_rate_disc': args.learning_rate_disc,
                         'batch_size': args.batch_size,
@@ -1331,8 +1211,6 @@ def main(args):
                         'loss_mode': args.loss_mode,
                         'datashape': args.datashape,
                         'optimizer': args.optimizer,
-                        # 'model_path': args.model_path,
-                        # 'model_name': args.model_name,
                         'log_path': args.log_path}
                         , model_saving_full_path)
         
@@ -1350,8 +1228,7 @@ def main(args):
         logger.info('vanila GAN model with WGAN-GP loss term training initiated!')
         for epoch in tqdm(range(args.epochs)):
             for batch_idx, (real, durability, weight, jewon, mask, imagename) in tqdm(enumerate(loader)):
-            #     break
-            # break
+
                 ##taking out inputs
                 real = real.view(-1, args.input_dim).to(args.device)
                 durability = durability.long().to(args.device)
@@ -1364,7 +1241,6 @@ def main(args):
                 disc.train()
                 
                 for _ in range(args.critic_iter):
-                    # break
                     ### Train Discriminator: max log(D(x)) + log(1 - D(G(z)))
                     
                     if args.gen_mode == 'vanila':
@@ -1378,8 +1254,6 @@ def main(args):
                         final_input = torch.cat((noise, durability, weight), dim=1)
                         fake = gen(final_input, jewon)
                     
-                    # noise = torch.randn(batch_size, args.zdim).to(args.device)
-                    # fake = gen(noise, durability, weight, jewon)
                     disc_real = disc(real).view(-1)
                     disc_fake = disc(fake).view(-1)
                     gp = gradient_penalty_onlyimage1d(disc, real, fake, device=args.device)
@@ -1392,21 +1266,7 @@ def main(args):
                 ### Train Generator: min log(1 - D(G(z))) <-> max log(D(G(z))
                 # where the second option of maximizing doesn't suffer from
                 # saturating gradients     
-                
-                    # if args.gen_mode == 'vanila':
-                    #     # noise = torch.randn(batch_size, args.zdim).to(args.device)
-                    #     gen_fake = gen(noise, durability, weight, jewon)
-                    
-                    
-                    # #for selfattention models
-                    # elif args.gen_mode == 'selfattention':
-                    #     # noise = torch.randn(batch_size, args.zdim).to(args.device)
-                    #     # final_input = torch.cat((noise, durability, weight), dim=1)
-                    #     gen_fake = gen(final_input, jewon)
-                        
-                        
-                # gen_fake = gen(noise, durability, weight, jewon)   
-                # loss_gen = -(torch.mean(disc(gen_fake)))  -args.constraint_lambda*torch.norm(jewon - torch.mul(mask, gen_fake))
+
                 loss_gen = -(torch.mean(disc(fake)))  -args.constraint_lambda*torch.norm(jewon - torch.mul(mask, fake))
         
                 gen.zero_grad()
@@ -1427,17 +1287,13 @@ def main(args):
                         disc.eval()
                         
                         if args.gen_mode == 'vanila':
-                            # noise = torch.randn(batch_size, args.zdim).to(args.device)
                             fake = gen(noise, durability, weight, jewon)
                         
                         
                         #for selfattention models
                         elif args.gen_mode == 'selfattention':
-                            # noise = torch.randn(batch_size, args.zdim).to(args.device)
-                            # final_input = torch.cat((noise, durability, weight), dim=1)
                             fake = gen(final_input, jewon)
                             
-                        # fake = gen(final_noise, jewon)#.reshape(-1, 3, 10, 30)
                         fake = fake.reshape(-1, 3, args.height, args.width)
                         real = real.reshape(-1, 3, args.height, args.width)
                         jewon=jewon.reshape(-1, 3, args.height, args.width)
@@ -1585,8 +1441,6 @@ def main(args):
                         'qhead_state_dict' : qhead.state_dict(),
                         'opt_disc': opt_disc.state_dict(),
                         'opt_gen': opt_gen.state_dict(),
-                        # 'norm_mean': args.norm_mean,
-                        # 'norm_stdv': args.norm_stdv,
                         'learning_rate_gen': args.learning_rate_gen,
                         'learning_rate_disc': args.learning_rate_disc,
                         'batch_size': args.batch_size,
@@ -1612,8 +1466,6 @@ def main(args):
                         'loss_mode': args.loss_mode,
                         'datashape': args.datashape,
                         'optimizer': args.optimizer,
-                        # 'model_path': args.model_path,
-                        # 'model_name': args.model_name,
                         'log_path': args.log_path}
                         , model_saving_full_path)
             
@@ -1625,8 +1477,6 @@ def main(args):
                         'gen_state_dict': gen.state_dict(),
                         'opt_disc': opt_disc.state_dict(),
                         'opt_gen': opt_gen.state_dict(),
-                        # 'norm_mean': args.norm_mean,
-                        # 'norm_stdv': args.norm_stdv,
                         'learning_rate_gen': args.learning_rate_gen,
                         'learning_rate_disc': args.learning_rate_disc,
                         'batch_size': args.batch_size,
@@ -1652,8 +1502,6 @@ def main(args):
                         'loss_mode': args.loss_mode,
                         'datashape': args.datashape,
                         'optimizer': args.optimizer,
-                        # 'model_path': args.model_path,
-                        # 'model_name': args.model_name,
                         'log_path': args.log_path}
                         , model_saving_full_path)
         
@@ -1683,14 +1531,8 @@ def main(args):
 
                 
                 for _ in range(args.critic_iter):
-                    # break
                     ### Train Discriminator: max log(D(x)) + log(1 - D(G(z)))
-                    
-                    ##for normal model
-                    # noise = torch.randn(batch_size, args.zdim).to(args.device)
-                    # final_noise = torch.cat((noise, durability.unsqueeze(1), weight.unsqueeze(1)), dim =1)
-                    # fake = gen(noise, durability, weight, noise)
-                    
+
                     if args.gen_mode == 'vanila':
                         noise = torch.randn(batch_size, args.zdim).to(args.device)
                         fake = gen(noise, durability, weight, jewon)
@@ -1708,11 +1550,6 @@ def main(args):
                     disc_fake = disc(fake).view(-1)
                     
                     loss_disc = -(torch.mean(disc_real) - torch.mean(disc_fake))
-                    # lossD_real = criterion(disc_real, torch.ones_like(disc_real))        
-                    # lossD_fake = criterion(disc_fake, torch.zeros_like(disc_fake))
-                    # lossD = (lossD_real + lossD_fake) / 2
-                    
-                    # gp = gradient_penalty(disc, durability_weight, jewon, real_image, fake_image, device=device)
                     disc.zero_grad()
                     loss_disc.backward(retain_graph=True)
                     opt_disc.step()
@@ -1723,22 +1560,7 @@ def main(args):
                 ### Train Generator: min log(1 - D(G(z))) <-> max log(D(G(z))
                 # where the second option of maximizing doesn't suffer from
                 # saturating gradients     
-                
-                # if args.gen_mode == 'vanila':
-                #     # noise = torch.randn(batch_size, args.zdim).to(args.device)
-                #     gen_fake = gen(noise, durability, weight, jewon)
-                
-                
-                # #for selfattention models
-                # elif args.gen_mode == 'selfattention':
-                #     # noise = torch.randn(batch_size, args.zdim).to(args.device)
-                #     # final_input = torch.cat((noise, durability, weight), dim=1)
-                #     gen_fake = gen(final_input, jewon)
-                
-                
-                
-                
-                # loss_gen = -(torch.mean(disc(gen_fake)))  -args.constraint_lambda*torch.norm(jewon - torch.mul(mask, gen_fake))    
+  
                 loss_gen = -(torch.mean(disc(fake)))  -args.constraint_lambda*torch.norm(jewon - torch.mul(mask, fake))    
 
                 gen.zero_grad()
@@ -1758,21 +1580,19 @@ def main(args):
                         
                         
                         if args.gen_mode == 'vanila':
-                            # noise = torch.randn(batch_size, args.zdim).to(args.device)
+
                             fake = gen(noise, durability, weight, jewon)
                         
                         
                         #for selfattention models
                         elif args.gen_mode == 'selfattention':
-                            # noise = torch.randn(batch_size, args.zdim).to(args.device)
-                            # final_input = torch.cat((noise, durability, weight), dim=1)
+
                             fake = gen(final_input, jewon)
                             
-                        # fake = gen(noise, durability, weight, jewon)#.reshape(-1, 3, 10, 30)
+
                         fake = fake.reshape(-1, 3, args.height, args.width)
                         real = real.reshape(-1, 3, args.height, args.width)
                         jewon=jewon.reshape(-1, 3, args.height, args.width)
-                        # z = jewon.detach().cpu().numpy()
                         
                         if args.datashape == 'dropempty':
                             
@@ -1846,9 +1666,7 @@ def main(args):
                         
                         img_grid_fake = torchvision.utils.make_grid(final_original_fake[20:30], normalize=True)#, normalize=True)
                         img_grid_real = torchvision.utils.make_grid(final_original_real[20:30], normalize=True)#, normalize=True)
-                        
-                        # img_grid_fake = torchvision.utils.make_grid(fake[20:30])#, normalize=True)
-                        # img_grid_real = torchvision.utils.make_grid(real[20:30])#, normalize=True)
+
                         
                         
                         writer_fake.add_image(
@@ -1927,19 +1745,6 @@ def main(args):
                                 jewon = Image.fromarray(jewon)
                                 jewon.save(f'{generated_image_path}/jewon/jewon_{i}.bmp')
                                 
-                                
-                            # for i, f in enumerate(fake):
-                            #     f = Image.fromarray(f)
-                            #     f.save(f'{generated_image_path}/fake/fake_{i}.bmp')
-                                
-                            # logger.info("The generated image output directory is created!")
-                            # for i, r in enumerate(real):
-                            #     r = Image.fromarray(r)
-                            #     r.save(f'{generated_image_path}/real/real_{i}.bmp')
-                                
-                            # for i, j in enumerate(jewon):
-                            #     j = Image.fromarray(j)
-                            #     j.save(f'{generated_image_path}/jewon/jewon_{i}.bmp')
 
                             
         if args.gan_model == 'infogan':
@@ -1952,8 +1757,6 @@ def main(args):
                         'qhead_state_dict' : qhead.state_dict(),
                         'opt_disc': opt_disc.state_dict(),
                         'opt_gen': opt_gen.state_dict(),
-                        # 'norm_mean': args.norm_mean,
-                        # 'norm_stdv': args.norm_stdv,
                         'learning_rate_gen': args.learning_rate_gen,
                         'learning_rate_disc': args.learning_rate_disc,
                         'batch_size': args.batch_size,
@@ -1979,8 +1782,6 @@ def main(args):
                         'loss_mode': args.loss_mode,
                         'datashape': args.datashape,
                         'optimizer': args.optimizer,
-                        # 'model_path': args.model_path,
-                        # 'model_name': args.model_name,
                         'log_path': args.log_path}
                         , model_saving_full_path)
             
@@ -1992,8 +1793,6 @@ def main(args):
                         'gen_state_dict': gen.state_dict(),
                         'opt_disc': opt_disc.state_dict(),
                         'opt_gen': opt_gen.state_dict(),
-                        # 'norm_mean': args.norm_mean,
-                        # 'norm_stdv': args.norm_stdv,
                         'learning_rate_gen': args.learning_rate_gen,
                         'learning_rate_disc': args.learning_rate_disc,
                         'batch_size': args.batch_size,
@@ -2019,15 +1818,12 @@ def main(args):
                         'loss_mode': args.loss_mode,
                         'datashape': args.datashape,
                         'optimizer': args.optimizer,
-                        # 'model_path': args.model_path,
-                        # 'model_name': args.model_name,
                         'log_path': args.log_path}
                         , model_saving_full_path)
         
         
-        # print('training took ', f'{time.time()-s}', ' seconds')
+
         logger.info(f'training took {time.time()-s} seconds') 
-        # print('Job done ')
         logger.info('training loop done!') 
         
                     

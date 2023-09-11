@@ -32,60 +32,7 @@ from sklearn.preprocessing import StandardScaler , MinMaxScaler
 import matplotlib.pyplot as plt
 from IPython import display
 import os
-# y_rootdir = r"C:\Users\hojun\OneDrive\Desktop\Hojun\Hyundai\Second_part\data\result_new"
-# x_rootdir = r"C:\Users\hojun\OneDrive\Desktop\Hojun\Hyundai\data"
-# def HyundayMultioutputData(x_rootdir, y_root_dir):
-#     datanames = os.listdir(y_rootdir)
 
-#     y_data = []
-#     x_data = []
-#     for dataname in datanames:
-#         y = pd.read_csv(os.path.join(y_rootdir, dataname))    
-#         y_data.append(y.to_numpy())
-
-
-#         x_image_name = dataname[:-11]  + '.bmp'
-#         img_path = os.path.join(x_rootdir, x_image_name)   
-#         image = io.imread(img_path) 
-#         x_data.append(image)
-        
-
-#     x_data = np.stack(x_data)
-#     x_data = x_data.reshape(len(x_data), -1)
-        
-#     y_data = np.stack(y_data)
-#     y_data = np.squeeze(y_data, axis=2)
-    
-#     return x_data, y_data
-
-
-
-# dir(train_dataset)
-# train_dataset._x[0]
-# from matplotlib import pyplot as plt
-# from matplotlib import image as mpimg
-
-
-# plt.imshow(train_dataset._x[1000].reshape(10, 30, 3))
-# plt.show()
-
-
-
-                
-# img_grid_fake = torchvision.utils.make_grid(fake[20:30])#, normalize=True)
-# data = os.listdir(r"C:\Users\hojun\OneDrive\Desktop\Hojun\Hyundai\data")
-
-# x_data = io.imread(os.path.join(r"C:\Users\hojun\OneDrive\Desktop\Hojun\Hyundai\data", data[4646])) 
-# plt.imshow(x_data)
-# plt.show()
-# # zzzz = x_data[:, np.r_[0:6, 10:16, 20:22]]
-
-# x_data.shape
-
-# zzzz = x_data[:, np.r_[0:6, 10:16, 20:22]]
-# zzzz.shape
-# plt.imshow(zzzz)
-# plt.show()
 
 
 
@@ -94,15 +41,13 @@ import os
 
 class TorchHyundaiData(torch.utils.data.Dataset):
     def __init__(self, x_rootdir, y_rootdir, transform=None):
-        # self.data = pd.read_csv(csv_file)
+
         self.x_rootdir = x_rootdir
         self.y_rootdir = y_rootdir
         self.transform = transform
         self.data = os.listdir(self.x_rootdir)
         self.target = os.listdir(self.y_rootdir)
-        # self.minmax = MinMaxScaler()
-        # self.standard = StandardScaler()
-        # self.norm_mode = norm_mode
+
 
         self.x_data_list = []    
         self.y_data_list = []
@@ -115,21 +60,18 @@ class TorchHyundaiData(torch.utils.data.Dataset):
             
             self.y_data_list.append(y.to_numpy())
             
-            
-            
-            # x_image_name = target_dataname[:-11]  + '.bmp'
+
             x_image_name = target_dataname[7:-4]  + '.bmp'
             img_path = os.path.join(self.x_rootdir, x_image_name)   
             x_data = io.imread(img_path) 
             self.x_data_list.append(x_data)
 
         self.x = np.stack(self.x_data_list)
-        # x = x.reshape(len(x), -1)
+
             
         self.y = np.stack(self.y_data_list)
         self.y = np.squeeze(self.y, axis=2)
-        
-        # self.y = self.minmax.fit_transform(self.y)
+
             
         
         
@@ -163,9 +105,7 @@ class TorchDropEmptyHyundaiData(torch.utils.data.Dataset):
         self.transform = transform
         self.data = os.listdir(self.x_rootdir)
         self.target = os.listdir(self.y_rootdir)
-        # self.minmax = MinMaxScaler()
-        # self.standard = StandardScaler()
-        # self.norm_mode = norm_mode
+
 
         self.x_data_list = []    
         self.y_data_list = []
@@ -179,20 +119,16 @@ class TorchDropEmptyHyundaiData(torch.utils.data.Dataset):
             self.y_data_list.append(y.to_numpy())
             
             
-            
-            # x_image_name = target_dataname[:-11]  + '.bmp'
             x_image_name = target_dataname[7:-4]  + '.bmp'
             img_path = os.path.join(self.x_rootdir, x_image_name)   
             x_data = io.imread(img_path) 
             self.x_data_list.append(x_data[:, np.r_[0:6, 10:16, 20:22], :]) ## 공백열을 제거하기 위한 처리과정
 
         self.x = np.stack(self.x_data_list)
-        # x = x.reshape(len(x), -1)
             
         self.y = np.stack(self.y_data_list)
         self.y = np.squeeze(self.y, axis=2)
-        
-        # self.y = self.minmax.fit_transform(self.y)
+
             
  
     
@@ -257,7 +193,6 @@ class FormTorchData_inference(torch.utils.data.Dataset):
 
 class TorchHyundaiData_inference(torch.utils.data.Dataset):
     def __init__(self, x_rootdir, transform=None):
-        # self.data = pd.read_csv(csv_file)
         self.x_rootdir = x_rootdir
         self.transform = transform
         self.data = os.listdir(self.x_rootdir)
@@ -270,8 +205,7 @@ class TorchHyundaiData_inference(torch.utils.data.Dataset):
             self.x_data_list.append(x_data)
 
         self.x = np.stack(self.x_data_list)
-        # x = x.reshape(len(x), -1)
-            
+           
                   
     def __len__(self):
         return len(self.x_data_list)
@@ -286,12 +220,6 @@ class TorchHyundaiData_inference(torch.utils.data.Dataset):
         
         return transformed_image
 
-
-# zz = os.listdir(args.img_data_path)
-# for dataname in zz:
-#     img_path = os.path.join(args.img_data_path, dataname)    
-#     x_data = io.imread(img_path) 
-#     break
 
 
 class TorchDropEmptyHyundaiData_inference(torch.utils.data.Dataset):
@@ -308,10 +236,7 @@ class TorchDropEmptyHyundaiData_inference(torch.utils.data.Dataset):
             self.x_data_list.append(x_data[:, np.r_[0:6, 10:16, 20:22]]) ## 공백열을 제거하기 위한 처리과정
         
         self.x = np.stack(self.x_data_list)
-        
-        
-        # self.y = self.minmax.fit_transform(self.y)
-            
+
     def __len__(self):
         return len(self.x_data_list)
     
@@ -326,25 +251,3 @@ class TorchDropEmptyHyundaiData_inference(torch.utils.data.Dataset):
         
         return transformed_image
 
-
-
-# class TorchHyundaiData(Dataset) :
-#     def __init__(self, x, y, transform=None) :
-#         self.x = np.float32(x)
-#         self.y = y
-#         self.transform = transform
-
-#     def __len__(self,) :
-#         return len(self.y)
-
-#     def __getitem__(self, idx) :
-        
-#         image = self.x[idx]   
-#         target = self.y[idx]
-        
-#         if self.transform:
-#             transformed_image = self.transform(image)
-#             transformed_image = transformed_image.reshape(1, -1)
-
-        
-#         return transformed_image, target

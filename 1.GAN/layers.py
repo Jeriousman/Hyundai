@@ -124,11 +124,9 @@ class PreMLP(nn.Module):
         
         
         self.linear1 = nn.Linear(self.input_dim, self.input_dim)
-        # self.act1 = nn.LeakyReLU()
         self.act1 = nn.LeakyReLU()
         self.dropout1 = nn.Dropout(0.3)
         self.linear2 = nn.Linear(self.input_dim, self.input_dim)
-        # self.act2 = nn.LeakyReLU()
         self.act2 = nn.LeakyReLU()
         self.dropout2 = nn.Dropout(0.3)
         self.linear3 = nn.Linear(self.input_dim, self.seq_len*self.embed_dim)
@@ -161,12 +159,10 @@ class PostMLP(nn.Module):
 
         
         self.linear1 = nn.Linear(self.embed_dim * self.seq_len, self.embed_dim * self.seq_len)
-        # self.act1 = nn.LeakyReLU()
         self.act1 = nn.LeakyReLU()
         self.dropout1 = nn.Dropout(0.3)
         
         self.linear2 = nn.Linear(self.embed_dim * self.seq_len, self.embed_dim * self.seq_len)
-        # self.act2 = nn.LeakyReLU()
         self.act2 = nn.LeakyReLU()
         self.dropout2 = nn.Dropout(0.3)
         

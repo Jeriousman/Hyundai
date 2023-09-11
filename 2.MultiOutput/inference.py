@@ -95,7 +95,6 @@ def main(args):
         
         if config['model'] == 'mor':
             model = MultOutRegressor(image_dim , label_dim).to(device)
-            # model = MultOutRegressor(420 , args.label_dim).to(device)
         
         elif config['model'] == 'morsa':
             model = MultOutRegressorSelfAttentionMLP(img_dim=image_dim, seq_len=seq_len, embed_dim=embed_dim).to(device)
@@ -121,8 +120,7 @@ def main(args):
             print('loading y_scaler...')
         else:
             pass
-            
-        # model.eval()
+
         model.to(device)
         ##making result and prediction by test data
         test_predictions = []
@@ -150,7 +148,6 @@ def main(args):
 
         test_predictions_df = pd.DataFrame(test_predictions)
         test_predictions_df.to_csv(f"{args.output_path}/inference.csv", index=False)
-
 
 
 
@@ -205,7 +202,6 @@ def main(args):
 
         model = joblib.load(f'{args.model_dir_path}/model.joblib')
         y_pred = model.predict(x_data)
-        # y_pred[:10]
 
         if os.path.exists(f'{args.model_dir_path}/y_scaler.pkl'):
             y_scaler = pickle.load(open(f'{args.model_dir_path}/y_scaler.pkl', 'rb'))

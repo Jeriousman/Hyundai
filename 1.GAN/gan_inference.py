@@ -26,8 +26,6 @@ from skimage import io
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from PIL import Image
-# import cv2
-# import albumentations as A
 from layers import activation_layer, MLPLayers
 from dataset import HyundaiDataset_discrete
 import numpy as np
@@ -212,8 +210,7 @@ def main(args):
                     inversed_gen_img = Image.fromarray(inversed_gen_img.astype(np.uint8))
                     # inversed_gen_img.save(f'{args.gen_img_path}/{i}.png')  
                     inversed_gen_img.save(f'{args.gen_img_path}/{i}.bmp')  
-                    # save_image(inversed_gen_img, )
-                    # del fake
+
 
             
         elif datashape == 'dropempty':
@@ -410,7 +407,6 @@ def main(args):
             final_noise = torch.cat((noise, durability_labels, weight_labels), dim =1)
             
             mask = np.zeros((height, width, 3), dtype=np.uint8)
-            # mask = mask.astype('uint8')
             strut1 = np.array(args.strut1)
             print(strut1)
             strut2 = np.array(args.strut2)
@@ -450,7 +446,7 @@ def main(args):
                 for i in range(args.num_gen_image):
                     
 
-                    fake = gen(final_noise, jewon)#.reshape(-1, 3, 10, 30)
+                    fake = gen(final_noise, jewon)
                     fake = fake.reshape(3, height, width)
                     unnormalize_gen_img = UnNormalize((0.5,), (0.5,))(fake)
                     inversed_gen_img = UnToTensor(unnormalize_gen_img)
@@ -469,8 +465,7 @@ def main(args):
                     inversed_gen_img = Image.fromarray(inversed_gen_img.astype(np.uint8))
                     # inversed_gen_img.save(f'{args.gen_img_path}/{i}.png') 
                     inversed_gen_img.save(f'{args.gen_img_path}/{i}.bmp') 
-                    # save_image(inversed_gen_img, )
-                    # del fake
+
                     
         elif datashape == 'dropempty':
             
@@ -526,7 +521,7 @@ def main(args):
             with torch.no_grad():
                 for i in range(args.num_gen_image):
 
-                    fake = gen(final_noise, jewon)#.reshape(-1, 3, 10, 30)
+                    fake = gen(final_noise, jewon)
                     fake = fake.reshape(3, height, width)
                     unnormalize_gen_img = UnNormalize((0.5,), (0.5,))(fake)
                     inversed_gen_img = UnToTensor(unnormalize_gen_img)

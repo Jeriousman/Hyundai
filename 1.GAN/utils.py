@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torchvision
 
-# real_image.float(), durability_weight.float(), jewon1.float()
 def gradient_penalty(critic, durability_weight, jewon, real, fake, device="cpu"):
     BATCH_SIZE, image_dim = real.shape
     alpha = torch.rand((BATCH_SIZE, 1)).repeat(1, image_dim).to(device)
@@ -192,14 +191,6 @@ def noise_sample(n_dis_c, dis_c_dim, n_con_c, n_z, batch_size, device):
 
     return noise, idx
 
-# def inverse_normalize(tensor, mean, std):
-#     inv_normalize = transforms.Normalize(
-#         mean=[-mean/std, -mean/std, -mean/std],
-#         std=[1/0.229, 1/0.224, 1/0.255]
-#     )
-#     inv_tensor = inv_normalize(tensor)
-    
-#     return inv_tensor
 
 class UnNormalize(torchvision.transforms.Normalize):
     def __init__(self,mean,std,*args,**kwargs):

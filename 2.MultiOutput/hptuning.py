@@ -923,10 +923,11 @@ elif args.mode == 'ml':
         
         
         start = time.time()
-        results = fmin(objective,
+        best_results = fmin(objective,
                                      space=randomforest_space,
                                      algo=tpe.suggest,
                                      trials=trials,
+                                     max_evals=args.max_evals)
                                      
         end = time.time()
         print(f'The hyper-parameter tuning took {end - start} seconds')
@@ -1181,7 +1182,7 @@ elif args.mode == 'ml':
 
         
             print("Hyperparameters : {}".format(args)) ## This can be commented if not needed.
-            print("RMSE: {}\n".format(mean_squared_error(y_valid, y_pred, squared = False)))sssssssssssssssssssssssssssss
+            print("RMSE: {}\n".format(mean_squared_error(y_valid, y_pred, squared = False)))
 
             
             return {'loss': mean_squared_error(y_valid, y_pred, squared = False), 'status': STATUS_OK}
