@@ -6,4 +6,4 @@ HD Projects
 
 
 ## Owner: Hojun Seo 
-####Note: Due to Non-disclosure agreement only partially opened
+#### Note: Due to Non-disclosure agreement only partially opened
